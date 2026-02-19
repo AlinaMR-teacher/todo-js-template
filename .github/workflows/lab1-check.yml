@@ -1,0 +1,66 @@
+name: Lab1 Structure Check
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  check-structure:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check index.html exists
+        run: |
+          if [ ! -f "index.html" ]; then
+            echo "❌ index.html not found"
+            exit 1
+          fi
+
+      - name: Check css/style.css exists
+        run: |
+          if [ ! -f "css/style.css" ]; then
+            echo "❌ css/style.css not found"
+            exit 1
+          fi
+
+      - name: Check src/main.js exists
+        run: |
+          if [ ! -f "src/main.js" ]; then
+            echo "❌ src/main.js not found"
+            exit 1
+          fi
+
+      - name: Check main.js is connected in HTML
+        run: |
+          if ! grep -q "src/main.js" index.html; then
+            echo "❌ main.js is not connected in index.html"
+            exit 1
+          fi
+
+      - name: Check semantic tags
+        run: |
+          if ! grep -q "<header" index.html; then
+            echo "❌ <header> tag not found"
+            exit 1
+          fi
+
+          if ! grep -q "<main" index.html; then
+            echo "❌ <main> tag not found"
+            exit 1
+          fi
+
+      - name: Check CSS is not empty
+        run: |
+         if [ ! -s "css/style.css" ]; then
+            echo "❌ style.css is empty"
+            exit 1
+          fi
+      
+
+      - name: All checks passed
+        run: echo "✅ Lab1 structure is correct"
+
+        
