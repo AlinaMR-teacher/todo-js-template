@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect lab from PR branch
+        id: lab
+        run: |
+          BRANCH="${{ github.head_ref }}"
+          echo "PR branch: $BRANCH"
+
+          if [[ "$BRANCH" =~ ^lab[1-7]$ ]]; then
+            echo "lab=$BRANCH" >> $GITHUB_OUTPUT
+          else
+            echo "lab=lab1" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run tests for current lab
+        run: |
+          LAB="${{ steps.lab.outputs.lab }}"
+          echo "Running tests for $LAB"
+
+          if [ ! -f "tests/$LAB/check.sh" ]; then
+            echo "❌ tests/$LAB/check.sh not found"
+            exit 1
+          fi
+
+          bash "tests/$LAB/check.sh"
+
